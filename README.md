@@ -32,7 +32,7 @@ A full-stack web application with a Go backend and React TypeScript frontend for
    ```
 
 3. **Update database connection**:
-   - Edit `backend/main.go` and update the connection string with your PostgreSQL credentials:
+   - Edit `backend/database.go` and update the connection string with your PostgreSQL credentials:
    ```go
    connStr := "host=localhost port=5432 user=your_username password=your_password dbname=cvwo sslmode=disable"
    ```
@@ -40,7 +40,7 @@ A full-stack web application with a Go backend and React TypeScript frontend for
 4. **Start the backend server**:
    ```bash
    cd backend
-   go run main.go
+   go run main.go database.go
    ```
    The server will start on `http://localhost:8080`
 
