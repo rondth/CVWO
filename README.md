@@ -116,3 +116,7 @@ npm start
 - **Connection refused errors**: Make sure both backend and frontend servers are running
 - **Database connection errors**: Verify PostgreSQL is running and credentials in `database.go` are correct
 - **Schema errors**: The schema auto-initializes, but you can manually run `psql -U postgres -d cvwo -f backend/schema.sql` if needed
+
+Eron Dathan
+
+# Usage of AI. AI was used in inspiration for the code format and UI.
