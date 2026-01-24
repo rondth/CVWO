@@ -117,6 +117,8 @@ npm start
 - **Database connection errors**: Verify PostgreSQL is running and credentials in `database.go` are correct
 - **Schema errors**: The schema auto-initializes, but you can manually run `psql -U postgres -d cvwo -f backend/schema.sql` if needed
 
-Eron Dathan
+---
 
-# Usage of AI. AI was used in inspiration for the code format and UI.
+**Author**: Eron Dathan
+
+**AI Usage**: AI was used for inspiration in code format and UI design.
