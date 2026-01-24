@@ -8,22 +8,22 @@ import { createTheme, ThemeProvider } from '@mui/material';
 const theme = createTheme({
   palette: {
     primary: {
-      main : '#FAF9F6'
+      main: '#FAF9F6'
     },
     secondary: {
       main: '#e6f4ff',
     },
   },
   typography: {
-    h1 : {
+    h1: {
       fontSize: '3rem',
       fontWeight: 600,
     },
-    h2 : {
+    h2: {
       fontSize: '1.75rem',
       fontWeight: 500,
     },
-    h3 : {
+    h3: {
       fontSize: '1.5rem',
       fontWeight: 500,
     }

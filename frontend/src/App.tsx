@@ -17,11 +17,11 @@ function App() {
   const [userPosts, setUserPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(false);
   const [allPosts, setAllPosts] = useState<FeedPost[]>([]);
-  
+
   useEffect(() => {
     loadAllPosts();
   }, []);
-  
+
   useEffect(() => {
     if (currentUser) {
       loadPosts();
@@ -29,14 +29,14 @@ function App() {
       setUserPosts([]);
     }
   }, [currentUser]);
-  
+
   const ClickAble = async () => {
-    const handleClick=()=>{
-      
+    const handleClick = () => {
+
     }
   }
-  
-  const loadAllPosts = async () =>{
+
+  const loadAllPosts = async () => {
     try {
       setLoading(true);
       const posts = await getAllPosts();
@@ -48,7 +48,7 @@ function App() {
       setLoading(false);
     }
   }
-  
+
   const loadPosts = async () => {
     if (!currentUser) return;
 
@@ -87,7 +87,7 @@ function App() {
 
   const handleUpdatePost = async (id: number, updatedPost: Partial<Post>) => {
     if (!currentUser) return;
-    
+
     try {
       const updated = await updatePost(id, currentUser.id, updatedPost);
       setUserPosts(prev => prev.map(post => post.id === id ? updated : post));
@@ -102,14 +102,14 @@ function App() {
       {/*navbar menu*/}
       <AppBar position="static" color="secondary">
         <Toolbar>
-          <Typography variant="h6" component="div" sx = {{flexGrow:1}}>
+          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
             Gossip with Go
           </Typography>
-          <Button color="inherit" component={Link} to ="/">Home</Button>
-          <Button color="inherit" component={Link} to ="/posts">Posts</Button>
+          <Button color="inherit" component={Link} to="/">Home</Button>
+          <Button color="inherit" component={Link} to="/posts">Posts</Button>
           {currentUser ? (
             <>
-              <Button color="inherit" component={Link} to ="/dashboard">Dashboard</Button>
+              <Button color="inherit" component={Link} to="/dashboard">Dashboard</Button>
               <Button color="inherit" onClick={handleLogout}>Logout ({currentUser.username})</Button>
             </>
           ) : (
@@ -122,10 +122,10 @@ function App() {
       </AppBar>
       <Routes>
         <Route path="/" element={
-          <Home 
+          <Home
             allPosts={allPosts}
           />
-          } />
+        } />
         <Route path="/posts" element={
           <Posts
             isLoggedIn={!!currentUser}
@@ -143,6 +143,7 @@ function App() {
             loading={loading}
           />
         } />
+        <Route path="/comments/:postID" element={<Comments currentUser={currentUser} />} />
       </Routes>
 
     </Router>

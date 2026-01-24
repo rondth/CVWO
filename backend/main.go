@@ -44,7 +44,8 @@ func main() {
 	//feed
 	r.Get("/api/feed", handlers.GetAllPostsHandler(db))
 	//comments
-	// r.Get("api/comments", handlers.GetComments(db))
+	r.Get("/api/posts/{id}/comments", handlers.GetComments(db))
+	r.Post("/api/posts/{id}/comments", handlers.CreateCommentHandler(db))
 
 	log.Println("Server starting on :8080")
 	http.ListenAndServe(":8080", r)
