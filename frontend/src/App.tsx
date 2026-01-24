@@ -2,19 +2,26 @@ import React, { useState, useEffect } from 'react';
 import logo from './logo.svg';
 import './App.css';
 import { BrowserRouter as Router, Routes, Link, Route } from 'react-router-dom';
-import { AppBar, Button, Card, CardContent, Container, MenuItem, Select, TextField, Toolbar, Typography } from '@mui/material';
+import { AppBar, Button, Card, CardContent, Container, MenuItem, Select, TextField, Toolbar, Typography, CardActionArea } from '@mui/material';
 import Home from './components/Home';
 import Posts from './components/Posts';
 import Login from './components/Login';
+import Register from './components/Register';
 import Dashboard from './components/Dashboard';
-import { User, Post, getPosts, createPost, updatePost } from './services/api';
+import Comments from './components/Comments'
+import { User, Post, FeedPost, getPosts, createPost, updatePost, getAllPosts } from './services/api';
+
 
 function App() {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [userPosts, setUserPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(false);
-
-  // Load posts when user logs in
+  const [allPosts, setAllPosts] = useState<FeedPost[]>([]);
+  
+  useEffect(() => {
+    loadAllPosts();
+  }, []);
+  
   useEffect(() => {
     if (currentUser) {
       loadPosts();
@@ -22,7 +29,26 @@ function App() {
       setUserPosts([]);
     }
   }, [currentUser]);
-
+  
+  const ClickAble = async () => {
+    const handleClick=()=>{
+      
+    }
+  }
+  
+  const loadAllPosts = async () =>{
+    try {
+      setLoading(true);
+      const posts = await getAllPosts();
+      setAllPosts(posts);
+    } catch (error) {
+      console.error('Failed to load posts:', error);
+      alert('Failed to load posts');
+    } finally {
+      setLoading(false);
+    }
+  }
+  
   const loadPosts = async () => {
     if (!currentUser) return;
 
@@ -46,12 +72,13 @@ function App() {
     setCurrentUser(null);
   };
 
-  const handleAddPost = async (postData: Omit<Post, 'id' | 'created_at' | 'updated_at'>) => {
+  const handleAddPost = async (postData: Omit<Post, 'id' | 'user_id' | 'created_at' | 'updated_at'>) => {
     if (!currentUser) return;
 
     try {
       const newPost = await createPost({ ...postData, user_id: currentUser.id });
-      setUserPosts(prev => [newPost, ...prev]);
+      setUserPosts(prev => [newPost, ...Array.isArray(prev) ? prev : []]);
+      alert('Post created successfully');
     } catch (error) {
       console.error('Failed to create post:', error);
       alert('Failed to create post');
@@ -59,8 +86,10 @@ function App() {
   };
 
   const handleUpdatePost = async (id: number, updatedPost: Partial<Post>) => {
+    if (!currentUser) return;
+    
     try {
-      const updated = await updatePost(id, updatedPost);
+      const updated = await updatePost(id, currentUser.id, updatedPost);
       setUserPosts(prev => prev.map(post => post.id === id ? updated : post));
     } catch (error) {
       console.error('Failed to update post:', error);
@@ -71,7 +100,7 @@ function App() {
   return (
     <Router>
       {/*navbar menu*/}
-      <AppBar position="static">
+      <AppBar position="static" color="secondary">
         <Toolbar>
           <Typography variant="h6" component="div" sx = {{flexGrow:1}}>
             Gossip with Go
@@ -84,12 +113,19 @@ function App() {
               <Button color="inherit" onClick={handleLogout}>Logout ({currentUser.username})</Button>
             </>
           ) : (
-            <Button color="inherit" component={Link} to ="/login">Login</Button>
+            <>
+              <Button color="inherit" component={Link} to="/login">Login</Button>
+              <Button color="inherit" component={Link} to="/register">Register</Button>
+            </>
           )}
         </Toolbar>
       </AppBar>
       <Routes>
-        <Route path="/" element={<Home />} />
+        <Route path="/" element={
+          <Home 
+            allPosts={allPosts}
+          />
+          } />
         <Route path="/posts" element={
           <Posts
             isLoggedIn={!!currentUser}
@@ -99,6 +135,7 @@ function App() {
           />
         } />
         <Route path="/login" element={<Login onLogin={handleLogin} />} />
+        <Route path="/register" element={<Register onLogin={handleLogin} />} />
         <Route path="/dashboard" element={
           <Dashboard
             userPosts={userPosts}

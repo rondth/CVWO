@@ -3,10 +3,9 @@ package handlers
 import (
 	"database/sql"
 	"encoding/json"
+	"log"
 	"net/http"
-	"time"
 
-	"github.com/go-chi/chi/v5"
 	"github.com/rondth/CVWO/backend/models"
 )
 
@@ -22,24 +21,29 @@ func LoginHandler(db *sql.DB) http.HandlerFunc {
 			return
 		}
 
-		var user models.User
-		err := db.QueryRow("SELECT id, username, created_at FROM users WHERE username = $1", req.Username).Scan(&user.ID, &user.Username, &user.CreatedAt)
-		if err == sql.ErrNoRows {
-			// User doesn't exist, create them
-			err = db.QueryRow("INSERT INTO users (username, created_at) VALUES ($1, $2) RETURNING id", req.Username, time.Now()).Scan(&user.ID)
-			if err != nil {
-				http.Error(w, err.Error(), http.StatusInternalServerError)
-				return
-			}
-			user.Username = req.Username
-			user.CreatedAt = time.Now()
-		} else if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+		if req.Username == "" {
+			http.Error(w, "Username is required", http.StatusBadRequest)
 			return
 		}
 
+		var user models.User
+		err := db.QueryRow("SELECT id, username, created_at FROM users WHERE username = $1", req.Username).Scan(&user.ID, &user.Username, &user.CreatedAt)
+		//if no user found
+		if err == sql.ErrNoRows {
+			log.Printf("Login failed - User not found: %v", req.Username)
+			http.Error(w, "User not found", http.StatusUnauthorized)
+			return
+		} else if err != nil {
+			log.Printf("Login failed - Error querying user: %v", err)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		//success
 		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(user)
+		if err := json.NewEncoder(w).Encode(user); err != nil {
+			http.Error(w, "Failed to encode response", http.StatusInternalServerError)
+			return
+		}
 	}
 }
 
@@ -51,26 +55,36 @@ func RegisterHandler(db *sql.DB) http.HandlerFunc {
 			return
 		}
 
-		// Check if user already exists
+		if req.Username == "" {
+			http.Error(w, "Username is required", http.StatusBadRequest)
+			return
+		}
+
 		var existingID int64
 		err := db.QueryRow("SELECT id FROM users WHERE username = $1", req.Username).Scan(&existingID)
 		if err == nil {
+			log.Printf("User already exists: %v", req.Username)
 			http.Error(w, "User already exists", http.StatusConflict)
 			return
 		} else if err != sql.ErrNoRows {
+			log.Printf("Error checking existing user: %v", err) //logging the error
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
 
 		var user models.User
-		err = db.QueryRow("INSERT INTO users (username, created_at) VALUES ($1, $2) RETURNING id, username, created_at",
-			req.Username, time.Now()).Scan(&user.ID, &user.Username, &user.CreatedAt)
+		err = db.QueryRow("INSERT INTO users (username) VALUES ($1) RETURNING id, username, created_at",
+			req.Username).Scan(&user.ID, &user.Username, &user.CreatedAt)
 		if err != nil {
+			log.Printf("Error creating user: %v", err)
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
 
 		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(user)
+		if err := json.NewEncoder(w).Encode(user); err != nil {
+			http.Error(w, "Failed to encode response", http.StatusInternalServerError)
+			return
+		}
 	}
 }

@@ -21,9 +21,14 @@ function Login({ onLogin }: LoginProps) {
       const user = await loginUser(username.trim());
       onLogin(user);
       alert(`Logged in as ${user.username}`);
-    } catch (error) {
-      console.error('Login failed:', error);
-      alert('Login failed. Please try again.');
+    } catch (error: any) {
+      if (error.status === 401) {
+        console.error('Login failed:', error);
+        alert('No user found. Please register first.');
+      } else {
+        console.error('Login failed:', error);
+        alert('Login failed. Please try again.');
+      }
     } finally {
       setLoading(false);
     }
