@@ -84,3 +84,4 @@ A full-stack web application with a Go backend and React TypeScript frontend for
 - Database models are defined in the `models` package
 - API handlers are organized in the `handlers` package
 - Frontend uses React hooks for state management and API calls
+# Gossip-with-Go
