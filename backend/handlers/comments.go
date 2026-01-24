@@ -46,7 +46,7 @@ func GetComments(db *sql.DB) http.HandlerFunc {
 		}
 		defer rows.Close()
 
-		var comments []Comments
+		comments := []Comments{}
 		for rows.Next() {
 			var comm Comments
 			err := rows.Scan(&comm.ID, &comm.Body, &comm.Topic, &comm.Username)

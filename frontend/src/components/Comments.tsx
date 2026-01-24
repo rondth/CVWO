@@ -31,9 +31,11 @@ function Comments({ currentUser }: CommentsProps) {
         setComments(data);
       } else {
         console.error('Failed to fetch comments');
+        setComments([]);
       }
     } catch (error) {
       console.error('Error connecting to the backend', error);
+      setComments([]);
     } finally {
       setLoading(false);
     }
