@@ -85,3 +85,8 @@ A full-stack web application with a Go backend and React TypeScript frontend for
 - API handlers are organized in the `handlers` package
 - Frontend uses React hooks for state management and API calls
 # Gossip-with-Go
+
+Eron Dathan
+
+#Usage of AI.
+AI was used in inspiration for the code format and UI.
